@@ -1,0 +1,462 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.internal.android.dx.dex.code.DalvCode;
+
+/**
+ * Created by Robotics on 9/29/2018.
+ */
+@TeleOp(name="Basic: Mechanum Drive", group="MechaumDriveTest")
+//@Disabled
+public class MechanumDriveTestBackup extends LinearOpMode {
+
+    // Declare OpMode members.
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor leftFrontWheel = null;
+    private DcMotor rightFrontWheel = null;
+    private DcMotor rightBackWheel = null;
+    private DcMotor leftBackWheel = null;
+
+    private DcMotor gearMotor = null;
+    private DcMotor liftArm = null;
+
+    private Servo bucketOneServoOne = null;
+    private Servo bucketOneServoTwo = null;
+    private Servo bucketTwoServoOne = null;
+    private Servo bucketTwoServoTwo = null;
+
+    //private DcMotor LatchMotor = null;
+    //private Servo extensionServo = null;
+    //private Servo collectionServo = null;
+    //private DcMotor PivotMotor = null;
+
+
+    //OpticalDistanceSensor odsSensor;
+
+
+    @Override
+    public void runOpMode() {
+
+        // Initialize the hardware variables. Note that the strings used here as parameters
+        // to 'get' must correspond to the names assigned during the robot configuration
+        // step (using the FTC Robot Controller app on the phone).
+        leftFrontWheel = hardwareMap.get(DcMotor.class, "leftFront");
+        rightFrontWheel = hardwareMap.get(DcMotor.class, "rightFront");
+        leftBackWheel = hardwareMap.get(DcMotor.class, "leftBack");
+        rightBackWheel = hardwareMap.get(DcMotor.class, "rightBack");
+
+        gearMotor = hardwareMap.get(DcMotor.class, "gearMotor");
+        liftArm = hardwareMap.get(DcMotor.class, "liftArm");
+
+        bucketOneServoOne = hardwareMap.get(Servo.class, "bucketOneServoOne");
+        bucketOneServoTwo = hardwareMap.get(Servo.class, "bucketOneServoTwo");
+        bucketTwoServoOne = hardwareMap.get(Servo.class, "bucketTwoServoOne");
+        bucketTwoServoTwo = hardwareMap.get(Servo.class, "bucketTwoServoTwo");
+        //LatchMotor = hardwareMap.get(DcMotor.class, "Latch");
+        //extensionServo = hardwareMap.get(Servo.class, "Extender");
+        //collectionServo = hardwareMap.get(Servo.class, "Collector");
+        //PivotMotor = hardwareMap.get(DcMotor.class, "Pivot");
+
+        // Most robots need the motor on one side to be reversed to drive forward
+        // Reverse the motor that runs backwards when connected directly to the battery
+        leftFrontWheel.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
+        rightBackWheel.setDirection(DcMotor.Direction.REVERSE);
+        leftBackWheel.setDirection(DcMotor.Direction.FORWARD);
+        //LatchMotor.setDirection(DcMotor.Direction.REVERSE);
+        //extensionServo.setPosition(Servo.MIN_POSITION);
+        //collectionServo.setPosition(Servo.MIN_POSITION);
+        //PivotMotor.setDirection(DcMotor.Direction.FORWARD);
+
+        //LatchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //odsSensor = hardwareMap.get(OpticalDistanceSensor.class, "sensor_ods");
+
+
+
+
+
+
+
+
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+        // Wait for the game to start (driver presses PLAY)
+
+        //extensionServo.setPosition(0.5);
+        waitForStart();
+
+        //LatchMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        runtime.reset();
+        //collectionServo.setPosition(0.5);
+        //extensionServo.setPosition(0.5);
+
+        // run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) {
+
+            // Setup a variable for each drive wheel to save power level for telemetry
+            double leftPower;
+            double rightPower;
+            //float LatchPower;
+            //float CollectorIn;
+            //float CollectorOut;
+            double Ch1;
+            double Ch2;
+            double Ch3;
+
+            double gearMotorX;
+            double gearMotorY;
+
+            double moveArm;
+
+            boolean moveBuckets;
+            double targetPower = 0;
+
+
+
+
+
+            // Choose to drive using either Tank Mode, or POV Mode
+            // Comment out the method that's not used.  The default below is POV.
+
+            // POV Mode uses left stick to go forward, and right stick to turn.
+            // - This uses basic math to combine motions and is easier to drive straight.
+            //double drive = -gamepad1.left_stick_y;
+            //double turn  =  gamepad1.right_stick_x;
+            //leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
+            //rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+
+            // Tank Mode uses one stick to control each wheel.
+            // - This requires no math, but it is hard to drive forward slowly and keep straight.
+
+            leftPower = -gamepad1.left_stick_y;
+            rightPower = -gamepad1.right_stick_y;
+            //LatchPower = gamepad2.right_stick_y;
+            //CollectorOut = gamepad2.left_trigger;
+            //CollectorIn = gamepad2.right_trigger;
+
+
+
+
+
+
+
+
+
+
+            Ch1 = -gamepad1.right_stick_x;
+            Ch2 = gamepad1.left_stick_y;
+            Ch3 = -gamepad1.left_stick_x;
+
+            // Send calculated power to wheels
+            leftFrontWheel.setPower(Ch3 + Ch1 + Ch2);
+            leftBackWheel.setPower(Ch1 + Ch2 - Ch3);
+            rightBackWheel.setPower(Ch2 - Ch1 + Ch3);
+            rightFrontWheel.setPower(Ch2 - Ch1 -Ch3);
+            //LatchMotor.setPower(LatchPower);
+
+            targetPower = -this.gamepad1.left_stick_y;
+            // check to see if we need to move the servo.
+            if(gamepad1.y) {
+                // move to 0 degrees.
+                bucketOneServoOne.setPosition(0);
+                bucketOneServoTwo.setPosition(0);
+                bucketTwoServoOne.setPosition(0);
+                bucketTwoServoTwo.setPosition(0);
+            } else if (gamepad1.x || gamepad1.b) {
+                // move to 90 degrees.
+                servoTest.setPosition(0.5);
+            } else if (gamepad1.a) {
+                // move to 180 degrees.
+                servoTest.setPosition(1);
+            }
+            gearMotorX = gamepad2.left_stick_x;
+            gearMotorY = gamepad2.left_stick_y;
+
+            gearMotor.setPower(gearMotorX);
+            gearMotor.setPower(gearMotorY);
+
+            //if(odsSensor.getRawLightDetected() > 1000)
+            //{
+            //    LatchMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            //}
+
+
+            /*
+            if(CollectorIn < 0.5 && CollectorOut < 0.5)
+            {
+                collectionServo.setPosition(0.5);
+            }
+            else if(CollectorIn > 0.5)
+            {
+                collectionServo.setPosition(1);
+            }
+            else if(CollectorOut > 0.5)
+            {
+                collectionServo.setPosition(0);
+            }
+            */
+/////////////////////////////////////////////////////////////////////////
+/*
+                if (gamepad2.left_stick_y == 0)
+
+{
+
+    extensionServo.setPosition(servoPosition);
+
+}
+*/
+            /*
+            if(gamepad2.a == true)
+            {
+                PivotMotor.setPower(1);
+            }
+
+            else if(gamepad2.b)
+            {
+                PivotMotor.setPower(-1);
+            }
+            else if(gamepad2.a == false && gamepad2.b == false)
+            {
+                PivotMotor.setPower(0);
+            }
+
+
+
+            double servoOffset = 0.3;
+            if(gamepad2.x = true)
+            {
+                extensionServo.setPosition(++ servoOffset);
+
+            }
+            else if(gamepad2.y = true)
+            {
+
+                extensionServo.setPosition(-- servoOffset);
+
+            }
+            // extensionServo.setPosition(servoPosition);
+            */
+
+
+
+
+
+
+
+
+            // Show the elapsed game time and wheel power.
+            telemetry.addData("Status","Running");
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Left Stick Postion", "Y value:" + gamepad2.left_stick_y);
+            //telemetry.addData("Raw",    odsSensor.getRawLightDetected());
+            //telemetry.addData("Normal", odsSensor.getLightDetected());
+                /*
+                telemetry.addData("LF",+ Ch3 + Ch1 + Ch2);
+                telemetry.addData("LB",+ Ch1 + Ch2 - Ch3);
+                telemetry.addData("RB",+  Ch2 - Ch1 + Ch3);
+                telemetry.addData("RF",+ Ch2 - Ch1 -Ch3);
+                */
+            //telemetry.addData("LatchValue",LatchMotor.getCurrentPosition());
+            telemetry.update();
+
+        }
+
+    }
+
+}
+
+
+
+
+/* Copyright (c) 2017 FIRST. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted (subject to the limitations in the disclaimer below) provided that
+ * the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this list
+ * of conditions and the following disclaimer.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice, this
+ * list of conditions and the following disclaimer in the documentation and/or
+ * other materials provided with the distribution.
+ *
+ * Neither the name of FIRST nor the names of its contributors may be used to endorse or
+ * promote products derived from this software without specific prior written permission.
+ *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
+ * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+package org.firstinspires.ftc.teamcode;
+
+import android.graphics.Color;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+/**
+ * This file illustrates the concept of driving a path based on time.
+ * It uses the common Pushbot hardware class to define the drive on the robot.
+ * The code is structured as a LinearOpMode
+ *
+ * The code assumes that you do NOT have encoders on the wheels,
+ *   otherwise you would use: PushbotAutoDriveByEncoder;
+ *
+ *   The desired path in this example is:
+ *   - Drive forward for 3 seconds
+ *   - Spin right for 1.3 seconds
+ *   - Drive Backwards for 1 Second
+ *   - Stop and close the claw.
+ *
+ *  The code is written in a simple form with no optimizations.
+ *  However, there are several ways that this type of sequence could be streamlined,
+ *
+ * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
+ * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
+ */
+
+@Autonomous(name="Auto: Mecanum Auto", group="MechaumDriveTest")
+
+public class MechanumAuto extends LinearOpMode {
+
+    private ElapsedTime     runtime = new ElapsedTime();
+    // Declare OpMode members.
+    private DcMotor leftFrontWheel = null;
+    private DcMotor rightFrontWheel = null;
+    private DcMotor rightBackWheel = null;
+    private DcMotor leftBackWheel = null;
+    private DcMotor LatchMotor = null;
+    private Servo extensionServo = null;
+    OpticalDistanceSensor odsSensor;
+    private Servo collectionServo = null;
+    private DcMotor PivotMotor = null;
+
+
+    // ColorSensor colorSensor;
+    // States for different moves
+
+    //color sensor
+    //hue, saturation, value
+    // float hsvValues[] = {0F, 0F, 0F};
+    // final float value[] =hsvValues;
+
+    @Override
+    public void runOpMode() {
+
+        // Initialize the hardware variables. Note that the strings used here as parameters
+        // to 'get' must correspond to the names assigned during the robot configuration
+        // step (using the FTC Robot Controller app on the phone).
+        leftFrontWheel = hardwareMap.get(DcMotor.class, "leftFront");
+        rightFrontWheel = hardwareMap.get(DcMotor.class, "rightFront");
+        leftBackWheel = hardwareMap.get(DcMotor.class, "leftBack");
+        rightBackWheel = hardwareMap.get(DcMotor.class, "rightBack");
+        LatchMotor = hardwareMap.get(DcMotor.class, "Latch");
+        extensionServo = hardwareMap.get(Servo.class, "Extender");
+        collectionServo = hardwareMap.get(Servo.class, "Collector");
+        PivotMotor = hardwareMap.get(DcMotor.class, "Pivot");
+
+        // Most robots need the motor on one side to be reversed to drive forward
+        // Reverse the motor that runs backwards when connected directly to the battery
+        leftFrontWheel.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
+        rightBackWheel.setDirection(DcMotor.Direction.REVERSE);
+        leftBackWheel.setDirection(DcMotor.Direction.FORWARD);
+        LatchMotor.setDirection(DcMotor.Direction.REVERSE);
+        extensionServo.setPosition(Servo.MIN_POSITION);
+        collectionServo.setPosition(Servo.MIN_POSITION);
+        PivotMotor.setDirection(DcMotor.Direction.FORWARD);
+
+        LatchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        odsSensor = hardwareMap.get(OpticalDistanceSensor.class, "sensor_ods");
+
+
+        // Send telemetry message to signify robot waiting;
+        telemetry.addData("Status", "Ready to run");    //
+        telemetry.update();
+
+        //create a color sensor
+        // colorSensor = hardwareMap.get(ColorSensor.class, "color1");
+        //colorSensor.enableLed(true); // turn color sensor LED on, active mode
+
+        telemetry.addData("Initialization", "Complete");
+
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+
+        //Step 2
+        //go for 2 sec
+        runtime.reset();
+        while (opModeIsActive() && (runtime.seconds() < 2.0)) {
+            leftFrontWheel.setPower(0.5);
+            leftBackWheel.setPower(0.5);
+            rightBackWheel.setPower(-0.5);
+            rightFrontWheel.setPower(-0.5);
+        }
+
+        runtime.reset();
+
+        //Step 2
+        //go back 2 sec
+        while (opModeIsActive() && (runtime.time() < 2.0)) {
+
+            leftFrontWheel.setPower(-0.5);
+            leftBackWheel.setPower(-0.5);
+            rightBackWheel.setPower(0.5);
+            rightFrontWheel.setPower(0.5);
+        }
+
+        //runtime.reset();
+        // read color sensor
+        // while (opModeIsActive() && (runtime.time() < 1)) {
+        // Color.RGBToHSV(colorSensor.red() * 8, colorSensor.green() * 8, colorSensor.blue() * 8, hsvValues);
+        //}
+
+
+        //step 2
+
+        runtime.reset();
+
+        while (opModeIsActive() && (runtime.time() < 0.2)) {
+            //wait
+        }
+
+        //stop the motors
+        leftFrontWheel.setPower(0);
+        leftBackWheel.setPower(0);
+        rightBackWheel.setPower(0);
+        rightFrontWheel.setPower(0);
+
+
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+        sleep(1000);
+    }
+}
