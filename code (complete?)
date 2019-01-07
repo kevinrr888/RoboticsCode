@@ -1,0 +1,175 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.internal.android.dx.dex.code.DalvCode;
+
+/**
+ * Created by Robotics on 9/29/2018.
+ */
+@TeleOp(name="Basic: Mechanum Drive", group="MechaumDriveTest")
+//@Disabled
+public class MechanumDriveTestBackup extends LinearOpMode {
+
+    // Declare OpMode members.
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor leftFrontWheel = null;
+    private DcMotor rightFrontWheel = null;
+    private DcMotor rightBackWheel = null;
+    private DcMotor leftBackWheel = null;
+
+    private DcMotor gearMotor = null;
+    private DcMotor liftArm = null;
+
+
+    //BucketOne is bucket on left from a birds eye view
+    //BucketTwo is on right
+    //ServoOne is closest to robot when fully extended out
+    //ServoTwo is furthest
+    private Servo bucketOneServoOne = null;
+    private Servo bucketOneServoTwo = null;
+    private Servo bucketTwoServoOne = null;
+    private Servo bucketTwoServoTwo = null;
+
+    //private DcMotor LatchMotor = null;
+    //private Servo extensionServo = null;
+    //private Servo collectionServo = null;
+    //private DcMotor PivotMotor = null;
+
+
+    //OpticalDistanceSensor odsSensor;
+
+
+    @Override
+    public void runOpMode() {
+
+        // Initialize the hardware variables. Note that the strings used here as parameters
+        // to 'get' must correspond to the names assigned during the robot configuration
+        // step (using the FTC Robot Controller app on the phone).
+        leftFrontWheel = hardwareMap.get(DcMotor.class, "leftFront");
+        rightFrontWheel = hardwareMap.get(DcMotor.class, "rightFront");
+        leftBackWheel = hardwareMap.get(DcMotor.class, "leftBack");
+        rightBackWheel = hardwareMap.get(DcMotor.class, "rightBack");
+
+        gearMotor = hardwareMap.get(DcMotor.class, "gearMotor");
+        liftArm = hardwareMap.get(DcMotor.class, "liftArm");
+
+        bucketOneServoOne = hardwareMap.get(Servo.class, "bucketOneServoOne");
+        bucketOneServoTwo = hardwareMap.get(Servo.class, "bucketOneServoTwo");
+        bucketTwoServoOne = hardwareMap.get(Servo.class, "bucketTwoServoOne");
+        bucketTwoServoTwo = hardwareMap.get(Servo.class, "bucketTwoServoTwo");
+
+        // Most robots need the motor on one side to be reversed to drive forward
+        // Reverse the motor that runs backwards when connected directly to the battery
+        leftFrontWheel.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontWheel.setDirection(DcMotor.Direction.REVERSE);
+        rightBackWheel.setDirection(DcMotor.Direction.REVERSE);
+        leftBackWheel.setDirection(DcMotor.Direction.FORWARD);
+
+
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+        // Wait for the game to start (driver presses PLAY)
+
+        waitForStart();
+
+
+        runtime.reset();
+
+
+        // run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) {
+
+            // Setup a variable for each drive wheel to save power level for telemetry
+            double leftPower;
+            double rightPower;
+            //float LatchPower;
+            //float CollectorIn;
+            //float CollectorOut;
+            double Ch1;
+            double Ch2;
+            double Ch3;
+
+
+
+
+
+
+            // Choose to drive using either Tank Mode, or POV Mode
+            // Comment out the method that's not used.  The default below is POV.
+
+            // POV Mode uses left stick to go forward, and right stick to turn.
+            // - This uses basic math to combine motions and is easier to drive straight.
+            //double drive = -gamepad1.left_stick_y;
+            //double turn  =  gamepad1.right_stick_x;
+            //leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
+            //rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+
+            // Tank Mode uses one stick to control each wheel.
+            // - This requires no math, but it is hard to drive forward slowly and keep straight.
+
+            leftPower = -gamepad1.left_stick_y;
+            rightPower = -gamepad1.right_stick_y;
+
+
+
+
+
+
+
+
+
+
+            Ch1 = -gamepad1.right_stick_x;
+            Ch2 = gamepad1.left_stick_y;
+            Ch3 = -gamepad1.left_stick_x;
+
+            // Send calculated power to wheels
+            leftFrontWheel.setPower(Ch3 + Ch1 + Ch2);
+            leftBackWheel.setPower(Ch1 + Ch2 - Ch3);
+            rightBackWheel.setPower(Ch2 - Ch1 + Ch3);
+            rightFrontWheel.setPower(Ch2 - Ch1 -Ch3);
+
+
+            // check to see if we need to move the servos.
+            if(gamepad2.y || gamepad2.a) { //closes buckets
+                bucketOneServoOne.setPosition(-0.25);
+                bucketOneServoTwo.setPosition(0.25);
+                bucketTwoServoOne.setPosition(0.25);
+                bucketTwoServoTwo.setPosition(-0.25);
+            } else if (gamepad1.x || gamepad1.b) { //opens buckets
+                bucketOneServoOne.setPosition(0.5);
+                bucketOneServoTwo.setPosition(-0.5);
+                bucketTwoServoOne.setPosition(-0.5);
+                bucketTwoServoTwo.setPosition(0.5);
+            }
+
+            double gearMotorPower = -gamepad2.left_stick_y;
+            gearMotor.setPower(gearMotorPower);
+
+            double armPower = -gamepad2.right_stick_y;
+            liftArm.setPower(armPower);
+
+
+
+
+
+            // Show the elapsed game time and wheel power.
+            telemetry.addData("Status","Running");
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Left Stick Postion", "Y value:" + gamepad2.left_stick_y);
+            telemetry.update();
+
+        }
+    }
+}
